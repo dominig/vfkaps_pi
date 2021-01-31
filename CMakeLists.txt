@@ -5,6 +5,10 @@
 ##---------------------------------------------------------------------------
 
 set(CMLOC "CMakeLists: ")
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+# This option is only usefull for debuging cmake process
+option (CMAKE_VERBOSE_MAKEFILE "activate extra debug to list each cmake step" OFF)
 
 # define minimum cmake version
 cmake_minimum_required(VERSION 3.1.1)
@@ -65,6 +69,8 @@ set(XML_DESCRIPTION "Download and install KAP charts from VentureFarther.com")
 ##
 
 set(CMAKE_CXX_STANDARD 11)
+option(USE_RPMBUILD "Build out of git tree as required by OBS (OpenSUSE) or Koji (Fedora, Centos, RedPesk)" OFF)
+
 
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")
@@ -95,7 +101,7 @@ include("cmake/PluginSetup.cmake")
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
+option(CMAKE_VERBOSE_MAKEFILE ON)
 
 option(Plugin_CXX11 "Use c++11" OFF)
 
@@ -224,7 +230,10 @@ endif(UNIX AND NOT APPLE)
 
 include("cmake/PluginInstall.cmake")
 include("cmake/PluginLocalization.cmake")
-include("cmake/PluginPackage.cmake")
+if (NOT USE_RPMBUILD)
+# rpm-build provides its own package creation internal tool
+include("PluginPackage")
+endif (NOT USE_RPMBUILD)
 
 ##
 ## ----- do not change section above - needed to configure build process ----- ##
